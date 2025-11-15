@@ -295,9 +295,24 @@
         <div class="model-selector">
             <label for="modelSelect">选择识别模型：</label>
             <select id="modelSelect">
-                <option value="small">Small - 快速（准确率一般）~500MB</option>
-                <option value="medium" selected>Medium - 推荐（准确率高）~1.5GB</option>
-                <option value="large">Large - 最慢（准确率最高）~3GB</option>
+                <option value="small">Small - 快速（3-5分钟）⚡⚡⚡</option>
+                <option value="medium" selected>Medium - 推荐（10-15分钟）⚡⚡</option>
+                <option value="large">Large - 最准确（20-30分钟）⚡</option>
+            </select>
+        </div>
+
+        <!-- 语言选择 -->
+        <div class="model-selector">
+            <label for="languageSelect">选择音频语言：</label>
+            <select id="languageSelect">
+                <option value="zh" selected>🇨🇳 中文（Chinese）</option>
+                <option value="en">🇺🇸 英文（English）</option>
+                <option value="ja">🇯🇵 日文（Japanese）</option>
+                <option value="ko">🇰🇷 韩文（Korean）</option>
+                <option value="es">🇪🇸 西班牙语（Spanish）</option>
+                <option value="fr">🇫🇷 法语（French）</option>
+                <option value="de">🇩🇪 德语（German）</option>
+                <option value="auto">🌐 自动检测（Auto）</option>
             </select>
         </div>
 
@@ -335,6 +350,7 @@
         const fileInfo = document.getElementById('fileInfo');
         const fileName = document.getElementById('fileName');
         const modelSelect = document.getElementById('modelSelect');
+        const languageSelect = document.getElementById('languageSelect');
         const startBtn = document.getElementById('startBtn');
         const progressContainer = document.getElementById('progressContainer');
         const progressFill = document.getElementById('progressFill');
@@ -408,6 +424,7 @@
             const formData = new FormData();
             formData.append('file', selectedFile);
             formData.append('model', modelSelect.value);
+            formData.append('language', languageSelect.value);
 
             try {
                 // 上传文件

@@ -7,7 +7,7 @@ Video2Txt Web Application
 
 import os
 import sys
-import whisper
+from faster_whisper import WhisperModel
 import uuid
 import json
 from pathlib import Path
@@ -57,6 +57,7 @@ def upload_file():
 
     file = request.files['file']
     model_size = request.form.get('model', 'medium')
+    language = request.form.get('language', 'zh')
 
     if file.filename == '':
         return jsonify({'error': '文件名为空'}), 400
@@ -77,6 +78,7 @@ def upload_file():
         'status': 'pending',
         'filename': filename,
         'model': model_size,
+        'language': language,
         'progress': 0,
         'file_path': file_path,
         'output_path': None,
@@ -101,18 +103,36 @@ def transcribe_task(task_id):
         task['status'] = 'processing'
         task['progress'] = 10
 
-        # 加载模型
-        print(f"[任务 {task_id}] 加载模型: {task['model']}")
-        model = whisper.load_model(task['model'])
+        # 加载模型（使用 Faster-Whisper）
+        print(f"[任务 {task_id}] 加载 Faster-Whisper 模型: {task['model']}")
+        model = WhisperModel(
+            task['model'],
+            device="cpu",
+            compute_type="int8"  # 使用 int8 量化，速度更快
+        )
         task['progress'] = 30
 
         # 执行转写
-        print(f"[任务 {task_id}] 开始转写: {task['filename']}")
-        result = model.transcribe(
+        print(f"[任务 {task_id}] 开始转写: {task['filename']}, 语言: {task['language']}")
+
+        # 处理语言参数：如果是 'auto'，则不指定语言让模型自动检测
+        language_param = task['language'] if task['language'] != 'auto' else None
+
+        segments, info = model.transcribe(
             task['file_path'],
-            language='Chinese',
-            verbose=False
+            language=language_param,
+            beam_size=5,
+            vad_filter=True  # 语音活动检测，跳过静音
         )
+        task['progress'] = 50
+
+        # 收集所有文本片段
+        print(f"[任务 {task_id}] 收集转写结果...")
+        full_text = []
+        for segment in segments:
+            full_text.append(segment.text.strip())
+
+        result_text = "".join(full_text)
         task['progress'] = 80
 
         # 保存结果
@@ -121,11 +141,11 @@ def transcribe_task(task_id):
         output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
 
         with open(output_path, 'w', encoding='utf-8') as f:
-            f.write(result['text'])
+            f.write(result_text)
 
         task['output_path'] = output_path
         task['output_filename'] = output_filename
-        task['text'] = result['text']
+        task['text'] = result_text
         task['status'] = 'completed'
         task['progress'] = 100
 
