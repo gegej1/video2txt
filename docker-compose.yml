@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  video2txt:
+    build: .
+    container_name: video2txt-app
+    ports:
+      - "5000:5000"
+    volumes:
+      # 持久化上传和输出目录
+      - ./uploads:/app/uploads
+      - ./outputs:/app/outputs
+      # 缓存 Whisper 模型（避免重复下载）
+      - whisper-cache:/root/.cache/whisper
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  whisper-cache:
+    driver: local

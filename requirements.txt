@@ -1,0 +1,10 @@
+openai-whisper>=20240930
+flask>=2.3.0
+torch>=2.0.0
+numpy>=1.24.0
+tiktoken>=0.12.0
+regex>=2022.1.18
+tqdm>=4.64.0
+numba>=0.56.0
+llvmlite>=0.43.0
+more-itertools>=10.0.0

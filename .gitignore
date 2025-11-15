@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+
+# 上传和输出文件
+uploads/*
+!uploads/.gitkeep
+outputs/*
+!outputs/.gitkeep
+whisper_output/*
+!whisper_output/.gitkeep
+
+# 媒体文件
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.flv
+*.wmv
+*.m4v
+*.webm
+*.mp3
+*.wav
+*.flac
+*.m4a
+*.aac
+*.ogg
+*.wma
+
+# 文本输出
+*.txt
+*.srt
+*.vtt
+*.json
+!requirements.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+.directory
+
+# 日志
+*.log
+
+# 环境变量
+.env
+.env.local
